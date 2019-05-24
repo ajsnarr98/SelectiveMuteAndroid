@@ -38,6 +38,8 @@ captures/
 .idea/tasks.xml
 .idea/gradle.xml
 .idea/assetWizardSettings.xml
+.idea/modules.xml
+.idea/navEditor.xml
 .idea/dictionaries
 .idea/libraries
 .idea/caches
@@ -63,3 +65,6 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+# misc
+.DS_Store
