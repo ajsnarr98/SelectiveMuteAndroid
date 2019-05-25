@@ -1,13 +1,14 @@
-package com.ajsnarr.choosewhatyoumute.AppList
+package com.ajsnarr.choosewhatyoumute
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.ajsnarr.choosewhatyoumute.R
+import com.ajsnarr.choosewhatyoumute.Data.App
 
-class AppAdapter(private val appList: Array<App>) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
+class AppAdapter(private val appList: Array<LiveData<App?>>) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
     private val size: Int = appList.size
 
@@ -23,7 +24,7 @@ class AppAdapter(private val appList: Array<App>) : RecyclerView.Adapter<AppAdap
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         val appName = holder.view.findViewById<TextView>(R.id.text_app_name)
 
-        appName.text = appList[position].name
+        appName.text = appList[position].value?.labelName ?: ""
     }
 
 
