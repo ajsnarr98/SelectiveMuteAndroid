@@ -1,4 +1,4 @@
-package com.ajsnarr.choosewhatyoumute
+package com.ajsnarr.choosewhatyoumute.activity
 
 import android.view.LayoutInflater
 import android.view.View
@@ -11,10 +11,12 @@ import com.ajsnarr.choosewhatyoumute.data.App
 import androidx.lifecycle.LifecycleOwner
 import android.content.ContextWrapper
 import androidx.lifecycle.MutableLiveData
+import com.ajsnarr.choosewhatyoumute.R
 
 
 class AppAdapter(private val appList: List<MutableLiveData<App>>,
-                 private val actionListener: ActionListener)
+                 private val actionListener: ActionListener
+)
     : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
     private val size: Int = appList.size
@@ -23,7 +25,9 @@ class AppAdapter(private val appList: List<MutableLiveData<App>>,
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_app_selection, parent, false)
 
-        return AppViewHolder(view)
+        return AppViewHolder(
+            view
+        )
     }
 
     override fun getItemCount() = appList.size

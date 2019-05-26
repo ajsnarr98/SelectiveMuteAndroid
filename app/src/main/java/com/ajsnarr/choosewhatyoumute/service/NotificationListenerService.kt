@@ -1,4 +1,4 @@
-package com.ajsnarr.choosewhatyoumute
+package com.ajsnarr.choosewhatyoumute.service
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification

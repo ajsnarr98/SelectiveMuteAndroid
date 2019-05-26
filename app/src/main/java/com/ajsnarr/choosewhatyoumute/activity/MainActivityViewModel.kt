@@ -1,16 +1,14 @@
-package com.ajsnarr.choosewhatyoumute
+package com.ajsnarr.choosewhatyoumute.activity
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ajsnarr.choosewhatyoumute.data.App
 import com.ajsnarr.choosewhatyoumute.db.AppDAO
 import com.ajsnarr.choosewhatyoumute.db.StoredApp
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
-import kotlin.math.log
 
 class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
                             application: Application): AndroidViewModel(application) {

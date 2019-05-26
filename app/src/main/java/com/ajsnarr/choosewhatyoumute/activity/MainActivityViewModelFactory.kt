@@ -1,4 +1,4 @@
-package com.ajsnarr.choosewhatyoumute
+package com.ajsnarr.choosewhatyoumute.activity
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -13,7 +13,11 @@ class MainActivityViewModelFactory(val db: AppDAO,
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
-            return MainActivityViewModel(db, installedApps, application) as T
+            return MainActivityViewModel(
+                db,
+                installedApps,
+                application
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

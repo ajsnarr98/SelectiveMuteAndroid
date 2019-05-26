@@ -1,22 +1,16 @@
-package com.ajsnarr.choosewhatyoumute
+package com.ajsnarr.choosewhatyoumute.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.ajsnarr.choosewhatyoumute.data.App
 import android.content.pm.PackageInfo
 import android.content.pm.ApplicationInfo
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ajsnarr.choosewhatyoumute.R
 import com.ajsnarr.choosewhatyoumute.db.AppDatabase
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 
 
 class MainActivity : AppCompatActivity() {
@@ -31,15 +25,22 @@ class MainActivity : AppCompatActivity() {
         val db = AppDatabase.getInstance(this.application).appDAO
 
         // create view model
-        val factory = MainActivityViewModelFactory(db, getInstalledApps(),
-            this.application)
+        val factory =
+            MainActivityViewModelFactory(
+                db, getInstalledApps(),
+                this.application
+            )
 
         viewModel = ViewModelProviders.of(this, factory)
             .get(MainActivityViewModel::class.java)
 
         // add to recycler view
-        val recyclerAdapter = AppAdapter(viewModel.appList,
-            RecyclerItemActionListener(viewModel))
+        val recyclerAdapter = AppAdapter(
+            viewModel.appList,
+            RecyclerItemActionListener(
+                viewModel
+            )
+        )
         val recyclerManager = LinearLayoutManager(this)
 
         findViewById<RecyclerView>(R.id.recycler_main).apply {
