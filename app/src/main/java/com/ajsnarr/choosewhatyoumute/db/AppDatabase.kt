@@ -1,11 +1,11 @@
-package com.ajsnarr.choosewhatyoumute.Data
+package com.ajsnarr.choosewhatyoumute.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [App::class], version = 1)
+@Database(entities = [StoredApp::class], version = 2)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract val appDAO: AppDAO

@@ -3,12 +3,19 @@ package com.ajsnarr.choosewhatyoumute
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import android.widget.TextView
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
-import com.ajsnarr.choosewhatyoumute.Data.App
+import com.ajsnarr.choosewhatyoumute.data.App
+import androidx.lifecycle.LifecycleOwner
+import android.content.ContextWrapper
+import androidx.lifecycle.MutableLiveData
 
-class AppAdapter(private val appList: Array<LiveData<App?>>) : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
+
+class AppAdapter(private val appList: List<MutableLiveData<App>>,
+                 private val actionListener: ActionListener)
+    : RecyclerView.Adapter<AppAdapter.AppViewHolder>() {
 
     private val size: Int = appList.size
 
@@ -23,10 +30,36 @@ class AppAdapter(private val appList: Array<LiveData<App?>>) : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         val appName = holder.view.findViewById<TextView>(R.id.text_app_name)
+        val switch = holder.view.findViewById<Switch>(R.id.switch_app_mute)
 
-        appName.text = appList[position].value?.labelName ?: ""
+        val app = appList[position].value
+        if (app != null) {
+            appName.text = app.labelName
+            switch.isChecked = !app.isMuted
+        }
+
+        appList[position].observe(getLifecycleOwner(holder.view), Observer {
+            switch.isChecked = !it.isMuted
+        })
+
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            if (app != null) {
+                actionListener.onSwitchChecked(appList[position], isChecked)
+            }
+        }
     }
 
+    private fun getLifecycleOwner(view: View): LifecycleOwner {
+        var context = view.getContext()
+        while (context !is LifecycleOwner) {
+            context = (context as ContextWrapper).baseContext
+        }
+        return context
+    }
 
     class AppViewHolder(val view: View) : RecyclerView.ViewHolder(view)
+
+    interface ActionListener {
+        fun onSwitchChecked(app: MutableLiveData<App>, isChecked: Boolean)
+    }
 }

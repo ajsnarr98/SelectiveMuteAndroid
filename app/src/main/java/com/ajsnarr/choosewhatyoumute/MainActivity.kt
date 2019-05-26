@@ -2,36 +2,44 @@ package com.ajsnarr.choosewhatyoumute
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.ajsnarr.choosewhatyoumute.Data.App
+import com.ajsnarr.choosewhatyoumute.data.App
 import android.content.pm.PackageInfo
 import android.content.pm.ApplicationInfo
-import androidx.lifecycle.LiveData
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.ajsnarr.choosewhatyoumute.Data.AppDatabase
-import com.ajsnarr.choosewhatyoumute.Data.AsyncAppDAO
+import com.ajsnarr.choosewhatyoumute.db.AppDatabase
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var job = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + job)
+    private lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // get db instance
-        val db = AsyncAppDAO(AppDatabase.getInstance(this.application).appDAO)
+        val db = AppDatabase.getInstance(this.application).appDAO
+
+        // create view model
+        val factory = MainActivityViewModelFactory(db, getInstalledApps(),
+            this.application)
+
+        viewModel = ViewModelProviders.of(this, factory)
+            .get(MainActivityViewModel::class.java)
 
         // add to recycler view
-        val recyclerAdapter =
-            AppAdapter(getInstalledApps(db))
+        val recyclerAdapter = AppAdapter(viewModel.appList,
+            RecyclerItemActionListener(viewModel))
         val recyclerManager = LinearLayoutManager(this)
 
         findViewById<RecyclerView>(R.id.recycler_main).apply {
@@ -45,37 +53,37 @@ class MainActivity : AppCompatActivity() {
     /**
      * Get installed apps, sorted in alphabetical order.
      */
-    private fun getInstalledApps(db: AsyncAppDAO): Array<LiveData<App?>> {
-        val res = ArrayList<LiveData<App?>>()
+    private fun getInstalledApps(): List<App> {
+        val res = ArrayList<App>()
         val packs = packageManager.getInstalledPackages(0)
 
         for (p in packs) {
             if (false == isSystemPackage(p)) {
+                val pkgName = p.applicationInfo.packageName
                 val appName = p.applicationInfo.loadLabel(packageManager).toString()
                 val icon = p.applicationInfo.loadIcon(packageManager)
-                val pkgName = p.applicationInfo.packageName
 
-                // Here the database is checked for an old setting for that app
-                val data = MutableLiveData<App?>()
-                uiScope.launch {
-                    data.value = App.getApp(
-                        db = db,
-                        packageName = pkgName,
-                        labelName = appName,
-                        icon = icon
-                    )
-                }
-                res.add(data)
+                res.add(App(packageName=pkgName, labelName=appName, icon=icon))
             }
         }
 
         // convert to array and sort in alphabetical order
-        return res.toTypedArray().apply {
-            sortBy { it.value?.labelName ?: "" }
-        }
+        return res
     }
 
     private fun isSystemPackage(pkgInfo: PackageInfo): Boolean {
         return pkgInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+    }
+
+    class RecyclerItemActionListener(val viewModel: MainActivityViewModel)
+        : AppAdapter.ActionListener {
+
+        override fun onSwitchChecked(
+            app: MutableLiveData<App>,
+            isChecked: Boolean
+        ) {
+            viewModel.onAppUpdate(app, isChecked)
+        }
+
     }
 }

@@ -3,9 +3,10 @@ package com.ajsnarr.choosewhatyoumute
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ajsnarr.choosewhatyoumute.Data.App
-import com.ajsnarr.choosewhatyoumute.Data.AppDAO
-import com.ajsnarr.choosewhatyoumute.Data.AppDatabase
+import com.ajsnarr.choosewhatyoumute.data.App
+import com.ajsnarr.choosewhatyoumute.db.AppDAO
+import com.ajsnarr.choosewhatyoumute.db.AppDatabase
+import com.ajsnarr.choosewhatyoumute.db.StoredApp
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -40,11 +41,11 @@ class AppDatabaseTest {
     @Test
     @Throws(Exception::class)
     fun insertAndGetApp() {
-        val id = "com.ajsnarr.testing123"
-        val app = App(id=id, isMuted=false)
+        val packageName = "com.ajsnarr.testing123"
+        val app = StoredApp(packageName=packageName, isMuted=false)
         appDao.insert(app)
-        val recievedApp = appDao.get(id)
-        Assert.assertEquals(app.id, recievedApp?.id)
+        val recievedApp = appDao.get(packageName)
+        Assert.assertEquals(app.packageName, recievedApp?.packageName)
         Assert.assertEquals(app.isMuted, recievedApp?.isMuted)
     }
 }
