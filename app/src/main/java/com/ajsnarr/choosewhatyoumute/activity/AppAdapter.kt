@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ajsnarr.choosewhatyoumute.data.App
 import androidx.lifecycle.LifecycleOwner
 import android.content.ContextWrapper
+import android.widget.ImageView
 import androidx.lifecycle.MutableLiveData
 import com.ajsnarr.choosewhatyoumute.R
 
@@ -35,17 +36,21 @@ class AppAdapter(private val appList: List<MutableLiveData<App>>,
     override fun onBindViewHolder(holder: AppViewHolder, position: Int) {
         val appName = holder.view.findViewById<TextView>(R.id.text_app_name)
         val switch = holder.view.findViewById<Switch>(R.id.switch_app_mute)
+        val image = holder.view.findViewById<ImageView>(R.id.image_app_icon)
 
         val app = appList[position].value
         if (app != null) {
             appName.text = app.labelName
             switch.isChecked = !app.isMuted
+            if (app.icon != null) image.setImageDrawable(app.icon)
         }
 
+        // update switch based on db value
         appList[position].observe(getLifecycleOwner(holder.view), Observer {
             switch.isChecked = !it.isMuted
         })
 
+        // set change listener for switch
         switch.setOnCheckedChangeListener { _, isChecked ->
             if (app != null) {
                 actionListener.onSwitchChecked(appList[position], isChecked)
