@@ -14,6 +14,7 @@ import com.ajsnarr.choosewhatyoumute.db.StoredApp
  */
 data class App(
     var packageName: String = "", // unique package labelName
+    val isSystemApp: Boolean,
     var isMuted: Boolean = true,
     var labelName: String = "empty",
     var icon: Drawable? = null
@@ -24,13 +25,14 @@ data class App(
          * Creates an app from an app stored in the DB.
          */
         fun fromDBObj(dbApp: StoredApp,
-                    labelName: String = "",
-                    icon: Drawable? = null): App {
+                      labelName: String = "",
+                      isSystemApp: Boolean = false,
+                      icon: Drawable? = null): App {
 
             // use package name for label name if label is not included
             val lblName = if (labelName == "") dbApp.packageName else labelName
-            return App(packageName=dbApp.packageName, isMuted=dbApp.isMuted,
-                labelName=lblName, icon=icon)
+            return App(packageName=dbApp.packageName, isSystemApp=isSystemApp,
+                isMuted=dbApp.isMuted, labelName=lblName, icon=icon)
          }
     }
 

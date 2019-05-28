@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Choose What You Mute</string>
     <string name="service_name">selective_mute_notification_service</string>
+    <string name="option_enable_system_apps">Show System Apps</string>
 </resources>

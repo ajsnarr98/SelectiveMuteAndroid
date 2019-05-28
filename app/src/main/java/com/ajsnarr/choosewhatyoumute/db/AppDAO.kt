@@ -1,6 +1,7 @@
 package com.ajsnarr.choosewhatyoumute.db
 
 import androidx.room.*
+import io.reactivex.Maybe
 import io.reactivex.Single
 
 @Dao
@@ -23,7 +24,7 @@ interface AppDAO {
      * Gets an app by package name.
      */
     @Query("SELECT * FROM apps WHERE packageName = :packageName")
-    fun get(packageName: String): StoredApp?
+    fun get(packageName: String): Maybe<StoredApp>
 
     /**
      * Get all apps.

@@ -13,6 +13,7 @@ class MainActivityViewModelFactory(val db: AppDAO,
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainActivityViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
             return MainActivityViewModel(
                 db,
                 installedApps,

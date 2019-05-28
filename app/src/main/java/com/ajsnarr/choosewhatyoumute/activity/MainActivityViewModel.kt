@@ -1,6 +1,7 @@
 package com.ajsnarr.choosewhatyoumute.activity
 
 import android.app.Application
+import android.text.BoringLayout
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -16,14 +17,15 @@ class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
     private var job = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + job)
 
-    private var isReadingFromDB = true
+    var showingSystemApps = MutableLiveData<Boolean>().apply { value = true }
+
     var appList: List<MutableLiveData<App>>
 
     init {
         // initialize appList to match installedApps with default state
         // wrap each app in a livedata obj
         appList = installedApps
-            .map({ app: App -> MutableLiveData<App>().apply { value = app } })
+            .map { app: App -> MutableLiveData<App>().apply { value = app } }
 
         // subscribe to observe apps when they are retrieved from the db
         db.getAll()
@@ -32,14 +34,11 @@ class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
             .subscribe(
                 { dbApps: List<StoredApp> -> // onSuccess
                     updateAppList(dbApps)
-                    isReadingFromDB = false
                 },
                 { _: Throwable? -> // onError
 
                 }
         )
-
-
     }
 
     /**
@@ -53,6 +52,17 @@ class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
             val dbApp = mappedDbAppList[app.packageName]
             if (dbApp != null) app.isMuted = dbApp.isMuted
         }
+    }
+
+    /**
+     * Update value of isShowingSystemApps
+     */
+    fun onCheckedShowingSystemApps(isChecked: Boolean) {
+        showingSystemApps.value = isChecked
+
+        val msg = if (showingSystemApps.value ?: false) "Showing system apps..."
+            else "Hiding system apps..."
+        Log.i("MainActivityViewModel", msg)
     }
 
     /**
