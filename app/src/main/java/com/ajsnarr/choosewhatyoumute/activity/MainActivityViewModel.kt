@@ -8,8 +8,11 @@ import androidx.lifecycle.MutableLiveData
 import com.ajsnarr.choosewhatyoumute.data.App
 import com.ajsnarr.choosewhatyoumute.db.AppDAO
 import com.ajsnarr.choosewhatyoumute.db.StoredApp
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
+
+private const val TAG = "MainActivityViewModel"
 
 class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
                             application: Application): AndroidViewModel(application) {
@@ -19,36 +22,25 @@ class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
 
     var showingSystemApps = MutableLiveData<Boolean>().apply { value = true }
 
-    var appList: List<MutableLiveData<App>>
+    var appList: List<App> = installedApps
 
-    init {
-        // initialize appList to match installedApps with default state
-        // wrap each app in a livedata obj
-        appList = installedApps
-            .map { app: App -> MutableLiveData<App>().apply { value = app } }
-
-        // subscribe to observe apps when they are retrieved from the db
+    /**
+     * Subscribe to observe apps when they are retrieved from the DB. Calls consumers on success and on error
+     */
+    fun getAllFromDB(onSuccess: (List<StoredApp>) -> Unit, onError: (Throwable?) -> Unit) {
         db.getAll()
             .subscribeOn(Schedulers.computation())
             .observeOn(Schedulers.io())
-            .subscribe(
-                { dbApps: List<StoredApp> -> // onSuccess
-                    updateAppList(dbApps)
-                },
-                { _: Throwable? -> // onError
-
-                }
-        )
+            .subscribe(onSuccess, onError)
     }
 
     /**
      * Updates the list of apps to have the same 'muted' values as the DB.
      */
-    private fun updateAppList(dbAppList: List<StoredApp>) {
+    fun updateAppList(dbAppList: List<StoredApp>) {
         val mappedDbAppList = dbAppList.map { it.packageName to it }.toMap()
 
-        for (appLD in appList) {
-            val app = appLD.value ?: continue
+        for (app in appList) {
             val dbApp = mappedDbAppList[app.packageName]
             if (dbApp != null) app.isMuted = dbApp.isMuted
         }
@@ -68,20 +60,20 @@ class MainActivityViewModel(val db: AppDAO, installedApps: List<App>,
     /**
      * Update given app.
      */
-    fun onAppUpdate(appLD: MutableLiveData<App>, isChecked: Boolean) {
+    fun onAppUpdate(appPackageName: String, isChecked: Boolean) {
 
-        val app = appLD.value
+        // get app with matching package name
+        val app = appList.last { it.packageName == appPackageName }
 
-        if (app != null) {
-            Log.i("MainActivityViewModel", "onAppUpdate ${app.packageName}")
+        Log.i(TAG, "onAppUpdate ${app.packageName} $isChecked")
 
-            // 'app's value is changed here too
-            appLD.value = app.apply { isMuted = !isChecked }
+        // 'app's value is changed here too
+        app.apply { isMuted = !isChecked }
 
-            uiScope.launch {
-                withContext(Dispatchers.IO) {
-                    db.insertOrUpdate(app.toDBObj())
-                }
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                val res = db.insertOrUpdate(app.toDBObj())
+                Log.i(TAG, "finished inserting app with result $res")
             }
         }
     }

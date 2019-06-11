@@ -2,4 +2,13 @@
     <string name="app_name">Choose What You Mute</string>
     <string name="service_name">selective_mute_notification_service</string>
     <string name="option_enable_system_apps">Show System Apps</string>
+
+    <!-- Strings related to the Alert Dialog -->
+    <string name="notification_listener_service">"Notification Listener Service"</string>
+    <string name="notification_listener_service_explanation">"For the the app. to work you need to enable the Notification Listener Service. Enable it now?"</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
+    <string name="do_not_disturb_permission">"Do Not Disturb Permission"</string>
+    <string name="do_not_disturb_permissoin_explanation">"For the the app. to work you need to enable the Do Not Disturb Permission. Enable it now?"</string>
 </resources>

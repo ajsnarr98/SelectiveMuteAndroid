@@ -1,6 +1,7 @@
 package com.ajsnarr.choosewhatyoumute.db
 
 import androidx.room.*
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Single
 
@@ -18,7 +19,7 @@ interface AppDAO {
      * the existing app.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(app: StoredApp)
+    fun insertOrUpdate(app: StoredApp): Long
 
     /**
      * Gets an app by package name.

@@ -36,5 +36,9 @@ data class App(
          }
     }
 
+    fun updateFromDBObj(dbApp: StoredApp) {
+        this.isMuted = dbApp.isMuted
+    }
+
     fun toDBObj() = StoredApp(packageName=packageName, isMuted=isMuted)
 }
